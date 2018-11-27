@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">LocalToken</string>
+
+    <!-- 회원가입과 관련된 string들 -->
+    <string name="prompt_email">email</string>
+    <string name="prompt_name">name</string>
+    <string name="prompt_password">password</string>
+    <string name="action_sign_in">로그인</string>
+    <string name="action_sign_up">회원 가입</string>
+
+</resources>
