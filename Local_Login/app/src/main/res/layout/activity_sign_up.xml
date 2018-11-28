@@ -11,16 +11,15 @@
         android:orientation="vertical">
 
         <EditText
-            android:id="@+id/name_Text"
+            android:id="@+id/s_name_Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
             android:hint="@string/prompt_name"
             android:maxLines="1"
             android:singleLine="true"/>
 
         <EditText
-            android:id="@+id/email_Text"
+            android:id="@+id/s_email_Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
@@ -29,7 +28,7 @@
             android:singleLine="true"/>
 
         <EditText
-            android:id="@+id/password_Text"
+            android:id="@+id/s_password_Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
@@ -45,14 +44,14 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/login_Button"
+                android:id="@+id/s_sign_up_Button"
                 android:text="@string/action_sign_up"
                 android:textStyle="bold"/>
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/create_Button"
+                android:id="@+id/s_login_Button"
                 android:text="@string/action_sign_in"
                 android:textStyle="bold"/>
 

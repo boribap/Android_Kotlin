@@ -1,9 +1,11 @@
 package com.bsww201.localtoken.localtoken
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_sign_up.*
 import java.util.regex.Pattern
 
 class SignUpActivity:AppCompatActivity() {
@@ -11,15 +13,15 @@ class SignUpActivity:AppCompatActivity() {
     private var nameEditText:String? = null
     private var emailEditText:String? = null
     private var passwordEditText:String? = null
-    private var checkSum : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_sign_up)
 
-        login_Button.setOnClickListener{
-            emailEditText = email_Text.text.toString()
-            passwordEditText = password_Text.text.toString()
+        s_sign_up_Button.setOnClickListener{
+            nameEditText = s_name_Text.text.toString()
+            emailEditText = s_email_Text.text.toString()
+            passwordEditText = s_password_Text.text.toString()
 
             if (!isValid()){
                 // 회원가입 실패
@@ -27,10 +29,15 @@ class SignUpActivity:AppCompatActivity() {
             }
             else{
                 // 회원가입 성공 --> 정보를 서버로 전달
+                Toast.makeText(this,"회원가입 성공", Toast.LENGTH_SHORT).show()
 
             }
         }
 
+        s_login_Button.setOnClickListener {
+            val loginIntent = Intent(this, MainActivity::class.java)
+            startActivity(loginIntent)
+        }
     }
 
     private fun checkNameForm(name : String?) : Boolean {
@@ -46,14 +53,17 @@ class SignUpActivity:AppCompatActivity() {
         if (email == null){
             return false
         }
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        val regex = "^[_a-zA-Z0-9-\\.]+@[\\.a-zA-Z0-9-]+\\.[a-zA-Z]+$"
+        val pattern = Pattern.compile(regex)
+        return pattern.matcher(email).matches()
     }
 
     private fun checkPasswordForm(password : String?) : Boolean {
         if (password == null){
             return false
         }
-        val regex = "^(?=.*\\d)(?=.*[~`!@#$%\\^&*()-])(?=.*[a-zA-Z]).{8,20}$"
+        //val regex = "^(?=.*\\d)(?=.*[~`!@#$%\\^&*()-])(?=.*[a-zA-Z]).{8,20}$"
+        val regex = "^[_a-zA-Z가-힣0-9]{2,6}"
         val pattern = Pattern.compile(regex)
         return pattern.matcher(password).matches()
     }
@@ -68,7 +78,7 @@ class SignUpActivity:AppCompatActivity() {
             return false
         }
         if (!checkPasswordForm(password = passwordEditText)){
-            Toast.makeText(this,"이메일 형식이 잘못되었습니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,"비밀번호 형식이 잘못되었습니다.", Toast.LENGTH_SHORT).show()
             return false
         }
 

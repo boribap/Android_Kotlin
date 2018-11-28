@@ -9,13 +9,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+
+        <!-- 로그인 하는 main 액티비 -->
+        <activity android:name=".MainActivity"
+            android:label="@string/action_sign_in">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 회원 가입하는 액티비티 -->
+        <activity android:name=".SignUpActivity"
+            android:label="@string/action_sign_up">
+        </activity>
+
     </application>
 
 </manifest>

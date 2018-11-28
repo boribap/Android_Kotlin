@@ -1,5 +1,6 @@
 package com.bsww201.localtoken.localtoken
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -13,5 +14,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        sign_up_Button.setOnClickListener{
+            val signupIntent = Intent(this, SignUpActivity::class.java)
+            startActivity(signupIntent)
+        }
     }
 }

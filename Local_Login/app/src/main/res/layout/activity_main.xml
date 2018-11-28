@@ -46,7 +46,7 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/create_Button"
+                android:id="@+id/sign_up_Button"
                 android:text="@string/action_sign_up"
                 android:textStyle="bold"/>
 
