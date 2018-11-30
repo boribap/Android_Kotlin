@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bsww201.localtoken.localtoken">
 
+    <!--node.js와 통신하기 위해 인터넷 연결 허용하는 퍼미션 설정-->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
