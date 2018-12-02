@@ -1,0 +1,11 @@
+extends layout
+
+block content
+    h1= title
+    form(action='/auth/login_process', method='post')
+        p 
+           input(type='text', name='userID', placeholder='id')
+        p 
+           input(type='password', name='userPW', placeholder='password')
+        p
+          input(type='submit', value='login')
