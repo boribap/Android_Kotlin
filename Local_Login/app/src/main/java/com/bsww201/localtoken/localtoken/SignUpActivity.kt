@@ -3,12 +3,10 @@ package com.bsww201.localtoken.localtoken
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.telecom.Call
 import android.util.Log
 import android.widget.Toast
-import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.activity_sign_up.*
-import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -37,7 +35,6 @@ class SignUpActivity:AppCompatActivity() {
 
             if (!isValid()){
                 // 회원가입 실패
-
             }
             else{
                 // 회원가입 성공 --> 정보를 서버로 전달
@@ -45,7 +42,7 @@ class SignUpActivity:AppCompatActivity() {
                 Log.e("회원가입 정보 : " , nameEditText + " " + emailEditText + " " + passwordEditText)
 
                 // retrofit : --> 정보를 서버로 전달
-                var baseurl = "http://172.20.10.2:7260/"
+                var baseurl = "http://192.168.0.4:7260/"
                 var retrofit : Retrofit = Retrofit.Builder()
                         .baseUrl(baseurl)
                         .addConverterFactory(GsonConverterFactory.create())
@@ -53,19 +50,22 @@ class SignUpActivity:AppCompatActivity() {
 
                 var serviceApi : ServiceApi = retrofit.create(ServiceApi::class.java)
                 user = user.User(nameEditText, emailEditText, passwordEditText)
-                var call : retrofit2.Call<Response<String>> = serviceApi.signUpData(user)
+                var call : Call<responseJSON> = serviceApi.signUpData(user)
 
-                call.enqueue(object : Callback<Response<String>>{
-                    override fun onResponse(call: retrofit2.Call<Response<String>>?, response: Response<Response<String>>?) {
+                call.enqueue(object : Callback<responseJSON>{
+                    override fun onResponse(call: Call<responseJSON>?, response: Response<responseJSON>?) {
                         Log.e("retrofit 들어옴", "retrofit 들어옴")
 
+                        var result1 : Int? = response?.code()
+                        Log.e("결과 값 1", result1.toString())
+
                         if (response!!.isSuccessful()){
-                            var result : String = response?.body().toString()
+                            var result : String = response.body().toString()
                             Log.e("결과 값", result)
                         }
                     }
 
-                    override fun onFailure(call: retrofit2.Call<Response<String>>?, t: Throwable?) {
+                    override fun onFailure(call: Call<responseJSON>?, t: Throwable?) {
                         Log.e("에러 남", t.toString())
                     }
                 })
@@ -85,7 +85,7 @@ class SignUpActivity:AppCompatActivity() {
         @POST("sign_up")
         fun signUpData(
                 @Body user: User
-        ): retrofit2.Call<Response<String>>
+        ): Call<responseJSON>
     }
 
     private fun checkNameForm(name : String?) : Boolean {
@@ -131,6 +131,22 @@ class SignUpActivity:AppCompatActivity() {
         }
 
         return true
+    }
+}
+
+class responseJSON {
+    var response : String? = null
+
+    public fun getID() : String?{
+        return response
+    }
+
+    public fun setID(response : String?) {
+        this.response = response
+    }
+
+    override fun toString(): String {
+        return "response: " + response
     }
 }
 
