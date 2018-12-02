@@ -45,7 +45,7 @@ class SignUpActivity:AppCompatActivity() {
                 Log.e("회원가입 정보 : " , nameEditText + " " + emailEditText + " " + passwordEditText)
 
                 // retrofit : --> 정보를 서버로 전달
-                var baseurl = "주소 적기"
+                var baseurl = "http://192.168.0.4:7260/"
                 var retrofit : Retrofit = Retrofit.Builder()
                         .baseUrl(baseurl)
                         .addConverterFactory(GsonConverterFactory.create())
@@ -57,20 +57,20 @@ class SignUpActivity:AppCompatActivity() {
 
                 call.enqueue(object : Callback<responseJSON>{
                     override fun onResponse(call: Call<responseJSON>?, response: Response<responseJSON>?) {
-                        Log.e("retrofit 들어옴", "retrofit 들어옴")
 
                         var result1 : Int? = response?.code()
-                        Log.e("결과 값 1 ", result1.toString())
+                        Log.e("응답 코드 ", result1.toString())
 
                         if (response!!.isSuccessful()){
                             var result : String = response.body().toString()
-                            Log.e("결과 값 2 ", result.toString())
+                            Log.e("JSON 데이터 ", result.toString())
                             var jsonobj : responseJSON = response.body()
                             var resmsg : String? = jsonobj.getID()
-                            Log.e("결과 값 3 ", resmsg)
+                            Log.e("필요 JSON 데이터 ", resmsg)
 
                             if(resmsg == "NO"){
                                 Toast.makeText(this@SignUpActivity,"중복되는 이메일이 존재합니다.", Toast.LENGTH_SHORT).show()
+                                s_email_Text.text.clear()
                             }else {
                                 Toast.makeText(this@SignUpActivity,"토큰을 전달하겠습니다.", Toast.LENGTH_SHORT).show()
                             }
