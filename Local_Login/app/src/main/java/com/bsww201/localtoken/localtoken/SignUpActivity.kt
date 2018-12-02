@@ -5,7 +5,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_sign_up.*
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -38,11 +42,10 @@ class SignUpActivity:AppCompatActivity() {
             }
             else{
                 // 회원가입 성공 --> 정보를 서버로 전달
-                Toast.makeText(this,"회원가입 성공", Toast.LENGTH_SHORT).show()
                 Log.e("회원가입 정보 : " , nameEditText + " " + emailEditText + " " + passwordEditText)
 
                 // retrofit : --> 정보를 서버로 전달
-                var baseurl = "http://192.168.0.4:7260/"
+                var baseurl = "주소 적기"
                 var retrofit : Retrofit = Retrofit.Builder()
                         .baseUrl(baseurl)
                         .addConverterFactory(GsonConverterFactory.create())
@@ -57,11 +60,20 @@ class SignUpActivity:AppCompatActivity() {
                         Log.e("retrofit 들어옴", "retrofit 들어옴")
 
                         var result1 : Int? = response?.code()
-                        Log.e("결과 값 1", result1.toString())
+                        Log.e("결과 값 1 ", result1.toString())
 
                         if (response!!.isSuccessful()){
                             var result : String = response.body().toString()
-                            Log.e("결과 값", result)
+                            Log.e("결과 값 2 ", result.toString())
+                            var jsonobj : responseJSON = response.body()
+                            var resmsg : String? = jsonobj.getID()
+                            Log.e("결과 값 3 ", resmsg)
+
+                            if(resmsg == "NO"){
+                                Toast.makeText(this@SignUpActivity,"중복되는 이메일이 존재합니다.", Toast.LENGTH_SHORT).show()
+                            }else {
+                                Toast.makeText(this@SignUpActivity,"토큰을 전달하겠습니다.", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
 
@@ -134,6 +146,7 @@ class SignUpActivity:AppCompatActivity() {
     }
 }
 
+// retrofit : 응답을 받기 위한 클래스
 class responseJSON {
     var response : String? = null
 
