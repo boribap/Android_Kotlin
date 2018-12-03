@@ -5,11 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_sign_up.*
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -33,6 +29,9 @@ class SignUpActivity:AppCompatActivity() {
         setContentView(R.layout.activity_sign_up)
 
         s_sign_up_Button.setOnClickListener{
+
+            val signinIntent = Intent(this, MainActivity::class.java)
+
             nameEditText = s_name_Text.text.toString()
             emailEditText = s_email_Text.text.toString()
             passwordEditText = s_password_Text.text.toString()
@@ -45,7 +44,7 @@ class SignUpActivity:AppCompatActivity() {
                 Log.e("회원가입 정보 : " , nameEditText + " " + emailEditText + " " + passwordEditText)
 
                 // retrofit : --> 정보를 서버로 전달
-                var baseurl = "http://192.168.0.4:7260/"
+                var baseurl = "주소 적기"
                 var retrofit : Retrofit = Retrofit.Builder()
                         .baseUrl(baseurl)
                         .addConverterFactory(GsonConverterFactory.create())
@@ -63,16 +62,33 @@ class SignUpActivity:AppCompatActivity() {
 
                         if (response!!.isSuccessful()){
                             var result : String = response.body().toString()
-                            Log.e("JSON 데이터 ", result.toString())
+                            Log.e("서버에서온 응답", result.toString())
                             var jsonobj : responseJSON = response.body()
                             var resmsg : String? = jsonobj.getID()
-                            Log.e("필요 JSON 데이터 ", resmsg)
+                            Log.e("토큰", resmsg)
 
                             if(resmsg == "NO"){
                                 Toast.makeText(this@SignUpActivity,"중복되는 이메일이 존재합니다.", Toast.LENGTH_SHORT).show()
                                 s_email_Text.text.clear()
                             }else {
-                                Toast.makeText(this@SignUpActivity,"토큰을 전달하겠습니다.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@SignUpActivity,"토큰을 저장하겠습니다.", Toast.LENGTH_SHORT).show()
+
+                                // sharedpreferences 에서 키값이 token, value가 resmsg인 값을 저장
+                                App.prefs.token = resmsg.toString()
+
+                                // 해당 위치에 저장된 값을 가져옴
+                                val msg = App.prefs.token
+
+                                if (msg == ""){
+                                    Toast.makeText(this@SignUpActivity, "토큰 없음", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    // 토큰 원하는 위치에 저장까지 완료
+                                    // 회원가입 끝
+                                    Toast.makeText(this@SignUpActivity, "저장됨 : $msg", Toast.LENGTH_SHORT).show()
+                                    // 로그인 페이지로 넘어가기
+                                    startActivity(signinIntent)
+                                }
+
                             }
                         }
                     }
@@ -100,6 +116,7 @@ class SignUpActivity:AppCompatActivity() {
         ): Call<responseJSON>
     }
 
+    // 회원가입 입력 폼에 대한 제한 (이름)
     private fun checkNameForm(name : String?) : Boolean {
         if (name == null){
             return false
@@ -109,6 +126,7 @@ class SignUpActivity:AppCompatActivity() {
         return patten.matcher(name).matches()
     }
 
+    // 회원가입 입력 폼에 대한 제한 (이메일)
     private fun checkEmailForm(email : String?) : Boolean {
         if (email == null){
             return false
@@ -118,6 +136,7 @@ class SignUpActivity:AppCompatActivity() {
         return pattern.matcher(email).matches()
     }
 
+    // 회원가입 입력 폼에 대한 제한 (비밀번호)
     private fun checkPasswordForm(password : String?) : Boolean {
         if (password == null){
             return false
@@ -128,6 +147,7 @@ class SignUpActivity:AppCompatActivity() {
         return pattern.matcher(password).matches()
     }
 
+    // 로그인에 대한 유효성 검사 (전체)
     private fun isValid() : Boolean {
         if (!checkNameForm(name = nameEditText)) {
             Toast.makeText(this,"이름 형식이 잘못되었습니다.", Toast.LENGTH_SHORT).show()
@@ -148,18 +168,18 @@ class SignUpActivity:AppCompatActivity() {
 
 // retrofit : 응답을 받기 위한 클래스
 class responseJSON {
-    var response : String? = null
+    var token : String? = null
 
     public fun getID() : String?{
-        return response
+        return token
     }
 
     public fun setID(response : String?) {
-        this.response = response
+        this.token = response
     }
 
     override fun toString(): String {
-        return "response: " + response
+        return "token : " + token
     }
 }
 

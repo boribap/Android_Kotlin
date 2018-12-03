@@ -8,6 +8,7 @@ import android.widget.EditText
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.regex.Pattern
 
+// 로그인 하는 화면 (메인화면)
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
