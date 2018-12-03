@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+
+// passport 할 때 사용했던 것
 var auth = require('../lib/auth');
 
 // mysql DB와 연동
@@ -14,6 +16,11 @@ var conn = mysql.createConnection({
 })
 
 conn.connect()
+
+// jwt사용을 위해 사용하는 것 
+var jwt = require('jsonwebtoken');
+var secretObj = require("../config/jwt");
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -40,8 +47,8 @@ router.post('/sign_up', function(req, res, next){
 
   console.log(req.body)
 
-  let JSONsendToken = { "response" : 'OK' }
-  let JSONsendNo = {"response" : 'NO'}
+
+  let JSONsendNo = {"token" : 'NO'}
 
   let user_name = req.body.user_name
   let user_email = req.body.user_email
@@ -61,27 +68,29 @@ router.post('/sign_up', function(req, res, next){
       console.log(results.affectedRows)
       // results.affectedRows == 1 이면 새로운 회원의 정보가 DB에 저장된 것 --> 토큰 전송
       if (results.affectedRows == 1){
-        // 토큰을 안드로이드로 전송하는 부분
+        // 토큰을 생성하여 안드로이드로 전송하는 부분
+
+        
+        let token = jwt.sign({
+          user_email
+        },
+        secretObj.secret,
+        {
+          expiresIn: '5m'
+        })
+
+        let JSONsendToken = { "token" : token }
+        console.log(JSONsendToken)
+
         res.send(JSONsendToken)
       } else {
+
+        console.log(JSONsendNo)
         res.send(JSONsendNo)
       }
 
     }
   })
-});
-
-// 데이터 주고 받기 위해 만든 것
-router.post('/data', function(req, res, next){
-  // morgan으로 교체해보기
-  console.log("@" + req.method + " " + req.url)
-
-  console.log(req.body)
-
-  res.body = "OK";
-
-  console.log(res.body)
-  res.send(res.body)
 });
 
 module.exports = router;
