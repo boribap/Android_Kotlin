@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity() {
         // 로그인 버튼 누르면 verify 가 성공하면 다음 인텐트로 전환되도록
         login_Button.setOnClickListener{
 
+            val calenderIntent = Intent(this, CalenderActivity::class.java)
+
             emailEditText = email_Text.text.toString()
             passwordEditText = password_Text.text.toString()
 
@@ -86,7 +88,7 @@ class MainActivity : AppCompatActivity() {
                                 Log.e("저장된 토큰 값", msg)
 
                                 // calender화면으로 전환
-
+                                startActivity(calenderIntent)
                             }
                         }
                     }
