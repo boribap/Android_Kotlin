@@ -48,7 +48,8 @@ router.post('/sign_up', function(req, res, next){
   console.log(req.body)
 
 
-  let JSONsendNo = {"token" : 'NO'}
+  let JSONsendDupl = {"response" : 'DUPL_EMAIL'}
+  let JSONsendComp = { "response" : 'SIGNIP_COMPLETE' }
 
   let user_name = req.body.user_name
   let user_email = req.body.user_email
@@ -56,41 +57,93 @@ router.post('/sign_up', function(req, res, next){
 
   console.log(user_name+ " " + user_email + " " + user_password)
 
-  // DB에 회원 정보를 삽입하는 부분 
+  // DB에 회원 정보를 삽입하는 부분 (이메일이 중복되면 저장 X)
   let store_sql = "insert into vasy.user_info (user_name, user_email, user_password) select ?,?,? from dual where not exists (select user_email from vasy.user_info where user_email=?);"
-  //let store_sql = "INSERT INTO user_info (user_name, user_email, user_password) VALUES (?,?,?);"
-
+  
   conn.query(store_sql, [user_name, user_email, user_password, user_email], function(err, results){
     if (err){
       console.log(err)
     }else{
       console.log("삽입완료 : " + user_name+ " " + user_email + " " + user_password)
+      // results.affectedRows == 1 이면 새로운 회원의 정보가 DB에 저장된 것
       console.log(results.affectedRows)
-      // results.affectedRows == 1 이면 새로운 회원의 정보가 DB에 저장된 것 --> 토큰 전송
+     
       if (results.affectedRows == 1){
-        // 토큰을 생성하여 안드로이드로 전송하는 부분
-
-        
-        let token = jwt.sign({
-          user_email
-        },
-        secretObj.secret,
-        {
-          expiresIn: '5m'
-        })
-
-        let JSONsendToken = { "token" : token }
-        console.log(JSONsendToken)
-
-        res.send(JSONsendToken)
+        // 이메일 중복되지 않아 DB에 저장이 된 것
+        // 'SIGNIP_COMPLETE' 를 안드로이드에 전송 --> 로그인 페이지로 넘어가기
+        console.log(JSONsendComp)
+        res.send(JSONsendComp)
       } else {
-
-        console.log(JSONsendNo)
-        res.send(JSONsendNo)
+        // 이메일이 중복되어서 DB에 저장이 되지 않은 것 
+        // 'DUPL_EMAIL'을 안드로이드에 전송 --> 이메일 텍스트 부분 비워주기
+        console.log(JSONsendDupl)
+        res.send(JSONsendDupl)
       }
 
     }
   })
 });
+
+router.post("/sign_in", function(req, res, next){
+  console.log("@" + req.method + " " + req.url)
+
+  let token
+  let LOGIN_PERMIT
+  let LOGIN_FAIL_EMAIL = { "response" : 'LOGIN_FAIL_EMAIL'}
+  let LOGIN_FAIL_PASSWORD = { "response" : 'LOGIN_FAIL_PASSWORD' }
+
+  // 안드로이드에서 보낸 이메일과 비밀번호 받기 (req.body)
+  let user_email = req.body.user_email
+  let user_password = req.body.user_password
+
+  console.log(user_email + " " + user_password)
+
+  // DB에서 일치여부 확인 : 이메일 먼저 확인해봄 --> 이메일이 일치하면 비밀번호 일치하는지 확인해봄
+  let sql_email_match = "select user_password from vasy.user_info where user_email=?"
+
+  conn.query(sql_email_match, [user_email], function(err, rows){
+    if ( err ) {
+      console.log(err)
+    }
+    else {
+      if(rows == ""){
+        // 이메일이 없으므로 회원 아님 --> 이메일 & 비번 위치 빈칸으로 만들기
+        console.log("회원이 아닙니다. 회원가입 해주세요.")
+        res.send(LOGIN_FAIL_EMAIL)
+      }
+      else {
+        // 이메일 & 비번 모두 일치
+        console.log(rows[0].user_password)
+        if(rows[0].user_password == user_password){
+
+          // DB에 일치하는 회원이 있으면 안드로이드에게 토큰을 발급해줌
+          console.log("이메일 일치 & 비밀번호 일치")
+
+          token = jwt.sign({
+            user_email,
+            user_password
+          },
+          secretObj.secret,
+          {
+            expiresIn: '5m'
+          })
+
+          LOGIN_PERMIT = { "response" : token }
+          res.send(LOGIN_PERMIT)
+        }
+        else {
+
+          // 비밀번호 불일치 --> 비번 위치 빈칸으로 만들기
+          console.log("비밀 번호 불일치")
+          res.send(LOGIN_FAIL_PASSWORD)
+        }
+      }
+    }
+  })
+})
+
+// router.get('/calender', function(req, res, next){
+//   console.log(req.headers.authorization)
+// })
 
 module.exports = router;
