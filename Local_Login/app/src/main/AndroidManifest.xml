@@ -29,6 +29,11 @@
             android:label="@string/action_sign_up">
         </activity>
 
+        <!-- 달력 보여주는 액티비티 -->
+        <activity android:name=".CalenderActivity"
+            android:label="달력">
+        </activity>
+
     </application>
 
 </manifest>
