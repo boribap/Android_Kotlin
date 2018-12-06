@@ -48,8 +48,8 @@ router.post('/sign_up', function(req, res, next){
   console.log(req.body)
 
 
-  let JSONsendDupl = {"response" : 'DUPL_EMAIL'}
-  let JSONsendComp = { "response" : 'SIGNIP_COMPLETE' }
+  let JSONsendDupl = new Array()
+  let JSONsendComp = new Array()
 
   let user_name = req.body.user_name
   let user_email = req.body.user_email
@@ -71,11 +71,17 @@ router.post('/sign_up', function(req, res, next){
       if (results.affectedRows == 1){
         // 이메일 중복되지 않아 DB에 저장이 된 것
         // 'SIGNIP_COMPLETE' 를 안드로이드에 전송 --> 로그인 페이지로 넘어가기
+
+        JSONsendComp.push({ "status" : 'SIGNUP_COMPLETE' })
+
         console.log(JSONsendComp)
         res.send(JSONsendComp)
       } else {
         // 이메일이 중복되어서 DB에 저장이 되지 않은 것 
         // 'DUPL_EMAIL'을 안드로이드에 전송 --> 이메일 텍스트 부분 비워주기
+
+        JSONsendDupl.push({"status" : 'DUPL_EMAIL'})
+
         console.log(JSONsendDupl)
         res.send(JSONsendDupl)
       }
@@ -87,10 +93,12 @@ router.post('/sign_up', function(req, res, next){
 router.post("/sign_in", function(req, res, next){
   console.log("@" + req.method + " " + req.url)
 
-  let token
+  let access_token
+  let refresh_token
+  let tokens = new Array()
   let LOGIN_PERMIT
-  let LOGIN_FAIL_EMAIL = { "response" : 'LOGIN_FAIL_EMAIL'}
-  let LOGIN_FAIL_PASSWORD = { "response" : 'LOGIN_FAIL_PASSWORD' }
+  let LOGIN_FAIL_EMAIL = new Array()
+  let LOGIN_FAIL_PASSWORD = new Array()
 
   // 안드로이드에서 보낸 이메일과 비밀번호 받기 (req.body)
   let user_email = req.body.user_email
@@ -100,6 +108,7 @@ router.post("/sign_in", function(req, res, next){
 
   // DB에서 일치여부 확인 : 이메일 먼저 확인해봄 --> 이메일이 일치하면 비밀번호 일치하는지 확인해봄
   let sql_email_match = "select user_password from vasy.user_info where user_email=?"
+  let sql_store_refresh = ""
 
   conn.query(sql_email_match, [user_email], function(err, rows){
     if ( err ) {
@@ -109,6 +118,9 @@ router.post("/sign_in", function(req, res, next){
       if(rows == ""){
         // 이메일이 없으므로 회원 아님 --> 이메일 & 비번 위치 빈칸으로 만들기
         console.log("회원이 아닙니다. 회원가입 해주세요.")
+
+        LOGIN_FAIL_EMAIL.push({ "status" : 'LOGIN_FAIL_EMAIL' })
+
         res.send(LOGIN_FAIL_EMAIL)
       }
       else {
@@ -119,22 +131,26 @@ router.post("/sign_in", function(req, res, next){
           // DB에 일치하는 회원이 있으면 안드로이드에게 토큰을 발급해줌
           console.log("이메일 일치 & 비밀번호 일치")
 
-          token = jwt.sign({
-            user_email,
-            user_password
-          },
-          secretObj.secret,
-          {
-            expiresIn: '5m'
-          })
+          access_token = jwt.sign({ user_email }, secretObj.secret, { expiresIn: '5m' })
+          refresh_token = jwt.sign({ user_email },  secretObj.secret, { expiresIn: '90d' })
 
-          LOGIN_PERMIT = { "response" : token }
+          tokens.push({ "status" : 'LOGIN_PERMIT' })
+          tokens.push({ "access_token" : access_token})
+          tokens.push({ "refresh_token" : refresh_token})
+
+          // refresh token 저장하는 것 추가하기 
+
+          LOGIN_PERMIT = tokens
+
           res.send(LOGIN_PERMIT)
         }
         else {
 
           // 비밀번호 불일치 --> 비번 위치 빈칸으로 만들기
           console.log("비밀 번호 불일치")
+
+          LOGIN_FAIL_PASSWORD.push({ "status" : 'LOGIN_FAIL_PASSWORD'})
+
           res.send(LOGIN_FAIL_PASSWORD)
         }
       }
