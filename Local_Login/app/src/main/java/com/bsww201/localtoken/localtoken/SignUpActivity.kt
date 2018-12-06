@@ -50,20 +50,20 @@ class SignUpActivity : AppCompatActivity() {
 
                 var serviceAPI : ServiceAPI = retrofit.create(ServiceAPI::class.java)
                 user = user.User(nameEditText, emailEditText, passwordEditText)
-                var call : Call<responseJSON> = serviceAPI.signUpData(user)
+                var call : Call<List<responseJSON>> = serviceAPI.signUpData(user)
 
-                call.enqueue(object : Callback<responseJSON>{
-                    override fun onResponse(call: Call<responseJSON>?, response: Response<responseJSON>?) {
+                call.enqueue(object : Callback<List<responseJSON>>{
+                    override fun onResponse(call: Call<List<responseJSON>>?, response: Response<List<responseJSON>>?) {
 
                         var result1 : Int? = response?.code()
                         Log.e("응답 코드 ", result1.toString())
 
                         if (response!!.isSuccessful()){
-                            var jsonobj : responseJSON = response.body()
-                            var resmsg : String? = jsonobj.getID()
-                            Log.e("응답 메세지", resmsg)
+                            var jsonobj : List<responseJSON> = response.body()
+                            var res_status : String? = jsonobj[0].getstatus()
+                            Log.e("응답 메세지", res_status)
 
-                            if(resmsg == "DUPL_EMAIL"){
+                            if(res_status == "DUPL_EMAIL"){
                                 Toast.makeText(this@SignUpActivity,"중복되는 이메일이 존재합니다.", Toast.LENGTH_SHORT).show()
                                 s_email_Text.text.clear()
                             }else {
@@ -71,12 +71,11 @@ class SignUpActivity : AppCompatActivity() {
                                 Toast.makeText(this@SignUpActivity, "회원 가입 완료", Toast.LENGTH_SHORT).show()
                                 // 로그인 페이지로 넘어가기
                                 startActivity(signinIntent)
-
                             }
                         }
                     }
 
-                    override fun onFailure(call: Call<responseJSON>?, t: Throwable?) {
+                    override fun onFailure(call: Call<List<responseJSON>>?, t: Throwable?) {
                         Log.e("에러 남", t.toString())
                     }
                 })

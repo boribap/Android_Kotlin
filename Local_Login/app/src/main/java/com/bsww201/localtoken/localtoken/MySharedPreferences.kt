@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 class MySharedPreferences(context: Context) {
     val PREFS_FILENAME = "prefs"
     val PREF_KEY_ACCESS_TOKEN = "access_token"
+    val PREF_KEY_REFRESH_TOKEN = "refresh_token"
     val prefs : SharedPreferences = context.getSharedPreferences(PREFS_FILENAME, 0)
 
     var access_token : String
@@ -14,4 +15,8 @@ class MySharedPreferences(context: Context) {
         get() = prefs.getString(PREF_KEY_ACCESS_TOKEN, "")
     // set(value) 실행 시 value로 값을 대체한 후 저장
         set(value) = prefs.edit().putString(PREF_KEY_ACCESS_TOKEN, value).apply()
+
+    var refresh_token : String
+        get() = prefs.getString(PREF_KEY_REFRESH_TOKEN, "")
+        set(value) = prefs.edit().putString(PREF_KEY_REFRESH_TOKEN, value).apply()
 }

@@ -12,12 +12,12 @@ interface ServiceAPI {
     @POST("sign_up")
     fun signUpData(
             @Body user: User
-    ): Call<responseJSON>
+    ): Call<List<responseJSON>>
 
     @POST("sign_in")
     fun loginData(
             @Body user:User
-    ): Call<responseJSON>
+    ): Call<List<responseJSON>>
 
     @GET("calender")
     fun loginData(

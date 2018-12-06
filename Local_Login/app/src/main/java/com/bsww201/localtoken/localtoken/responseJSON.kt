@@ -2,17 +2,33 @@ package com.bsww201.localtoken.localtoken
 
 // retrofit : 회원가입시 토큰 응답을 받기 위한 클래스
 class responseJSON {
-    var response : String? = null
+    var status : String? = null
+    var access_token : String? = null
+    var refresh_token : String? = null
+    var responseArray : Array<String?>? = null
 
-    public fun getID() : String?{
-        return response
+    public fun getstatus() : String?{
+        return status
     }
 
-    public fun setID(response : String?) {
-        this.response = response
+    public fun getAccessToken() : String? {
+        return access_token
     }
 
-    override fun toString(): String {
-        return "response : " + response
+    public fun getRefreshToken() : String? {
+        return refresh_token
     }
+
+//    public fun setID(response : String?) {
+//        this.response = response
+//    }
+
+//    public fun toStringA(access_token : String): String {
+//        return "access_token : " + access_token
+//    }
+//
+//    public fun toStringR(refresh_token : String) : String {
+//        return "refresh_token : " + refresh_token
+//    }
+
 }
